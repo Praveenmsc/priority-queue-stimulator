@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Priority Queue Stimulator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(120deg, #f2f2f2, #c9d6ff, #e2e2e2); /* Gradient background */
+            background-size: 600% 600%;
+            color: #333;
+            animation: backgroundShift 10s infinite alternate; /* Subtle animation */
+        }
+
+        @keyframes backgroundShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        h1 {
+            color: #333;
+            margin-top: 20px;
+            font-size: 2.5em;
+            font-family: 'Courier New', Courier, monospace;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .container {
+            width: 80%;
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9); /* Slight transparency */
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 1s ease-out;
+        }
+
+        .form-section, .queue-display, .feedback-section {
+            margin-bottom: 20px;
+        }
+
+        .form-section input {
+            width: calc(70% - 20px);
+            margin-right: 10px;
+            font-size: 18px;
+            border: 2px solid #007bff;
+            border-radius: 5px;
+            padding: 10px;
+            transition: border-color 0.3s;
+        }
+
+        .form-section input:focus {
+            border-color: #0056b3;
+            outline: none;
+        }
+
+        .form-section button {
+            width: 30%;
+            font-size: 18px;
+            padding: 15px;
+            border-radius: 5px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            margin-right: 15px; /* Increased space between buttons */
+        }
+
+        .form-section button:last-child {
+            margin-right: 0; /* Remove margin from the last button */
+        }
+
+        .form-section button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+
+        #enqueueButton, #printButton {
+            width: 45%; /* Adjusted width for better spacing */
+            font-size: 20px;
+            padding: 15px;
+        }
+
+        .form-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .form-section div {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+
+        .document {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px;
+            width: 140px;
+            text-align: center;
+            background-color: #fafafa;
+            border-radius: 8px;
+            transition: background-color 0.3s, transform 0.3s;
+            animation: slideIn 0.5s ease-out;
+            display: inline-block; /* Allow side-by-side display */
+        }
+
+        .document:hover {
+            background-color: #e0e0e0;
+            transform: scale(1.03);
+        }
+
+        .highlighted {
+            background-color: #ffeb3b;
+        }
+
+        .feedback-section {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .feedback-section .feedback {
+            color: #007bff;
+        }
+
+        .feedback-section .deleted {
+            color: #dc3545;
+        }
+
+        .feedback-section div {
+            margin-top: 10px;
+        }
+
+     
+            h2 {
+    color: #333;
+    margin-top: 20px;
+    font-family: 'Courier New', Courier, monospace; /* Applying the font style */
+    text-shadow: 2px 2px 5px rgba(0,0,0,0.3); /* Adding text-shadow for consistency */
+}
+
+       
+
+        #searchDocName {
+            width: calc(70% - 20px);
+            font-size: 18px;
+        }
+
+        /* Updated image styling for horizontal layout */
+        .image-horizontal {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .image-horizontal img {
+            margin-right: 10px; /* Space between images */
+            max-width: 100px;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .image-horizontal img:last-child {
+            margin-right: 0; /* Remove margin from the last image */
+        }
+
+        .image-horizontal img:hover {
+            transform: scale(1.05);
+        }
+
+        /* Keyframe animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Priority Queue Visualizer</h1>
+
+        <div class="form-section">
+            <div>
+                <input type="text" id="docName" placeholder="Enter document name">
+                <input type="number" id="priority" placeholder="Enter priority">
+            </div>
+            <div>
+                <button id="enqueueButton" onclick="enqueue()">Enqueue</button>
+                <button id="printButton" onclick="printDocument()">Print</button>
+            </div>
+        </div>
+
+        <!-- Added horizontal image container -->
+        <div class="image-horizontal" id="imageContainer">
+            <!-- Example images - Replace with your own images -->
+           
+        </div>
+
+        <div class="queue-container" id="queue"></div>
+
+        <div class="feedback-section">
+            <div class="printed" id="printedDocument">Printed Document: None</div>
+            <div class="deleted" id="deletedDocument"></div>
+        </div>
+
+        <div class="form-section">
+            <h2>Delete Document</h2>
+            <div>
+                <input type="text" id="deleteDocName" placeholder="Enter document name">
+                <input type="number" id="deletePriority" placeholder="Enter priority">
+            </div>
+            <button onclick="deleteDocument()">Delete</button>
+        </div>
+
+        <div class="form-section">
+            <h2>Change Priority</h2>
+            <div>
+                <input type="text" id="changeDocName" placeholder="Enter document name">
+                <input type="number" id="changePriority" placeholder="Enter new priority">
+            </div>
+            <button onclick="changePriority()">Change Priority</button>
+        </div>
+
+        <div class="form-section">
+            <h2>Search Document</h2>
+            <div>
+                <input type="text" id="searchDocName" placeholder="Enter document name">
+            </div>
+            <button onclick="searchDocument()">Search</button>
+            <div class="feedback" id="searchResult"></div>
+        </div>
+
+        <div class="feedback-section">
+            <div class="feedback" id="feedbackMessage"></div>
+        </div>
+    </div>
+
+    <script>
+        // Priority Queue array
+        let queue = [];
+
+        // Flag to prevent multiple clicks
+        let isProcessing = false;
+
+        // Function to enqueue a new document with priority
+        function enqueue() {
+            if (isProcessing) return;
+            isProcessing = true;
+
+            console.log('Enqueue function called');
+
+            const docName = document.getElementById('docName').value.trim();
+            const priorityInput = document.getElementById('priority').value.trim();
+            const priority = parseInt(priorityInput, 10);
+            
+            if (docName && !isNaN(priority)) {
+                queue.push({ name: docName, priority: priority });
+                // Sort queue by priority (ascending)
+                queue.sort((a, b) => a.priority - b.priority);
+                updateQueueDisplay();
+                document.getElementById('feedbackMessage').textContent = '';  // Clear feedback message
+                // Clear input fields
+                document.getElementById('docName').value = '';
+                document.getElementById('priority').value = '';
+            } else {
+                document.getElementById('feedbackMessage').textContent = 'Please enter a valid document name and priority.';
+            }
+            isProcessing = false;
+        }
+
+        // Function to print the document with the highest priority
+        function printDocument() {
+            if (isProcessing) return;
+            isProcessing = true;
+
+            console.log('Print function called');
+
+            if (queue.length > 0) {
+                const printedDoc = queue.shift();  // Remove the document with the highest priority
+                document.getElementById('printedDocument').textContent = `Printed Document: ${printedDoc.name} (Priority: ${printedDoc.priority})`;
+                updateQueueDisplay();
+                document.getElementById('feedbackMessage').textContent = '';  // Clear feedback message
+            } else {
+                document.getElementById('feedbackMessage').textContent = 'The queue is empty.';
+            }
+            isProcessing = false;
+        }
+
+        // Function to delete all documents by name and priority with visual feedback
+        async function deleteDocument() {
+            if (isProcessing) return;
+            isProcessing = true;
+
+            console.log('Delete function called');
+
+            const deleteDocName = document.getElementById('deleteDocName').value.trim();
+            const deletePriorityInput = document.getElementById('deletePriority').value.trim();
+            const deletePriority = parseInt(deletePriorityInput, 10);
+            
+            if (deleteDocName && !isNaN(deletePriority)) {
+                let deletedCount = 0;
+                for (let i = queue.length - 1; i >= 0; i--) {  // Loop backwards to handle deletion correctly
+                    const doc = queue[i];
+
+                    // Highlight the document being checked
+                    highlightDocument(i);
+                    await sleep(500);  // Wait for 500ms to simulate the checking process
+                    
+                    if (doc.name === deleteDocName && doc.priority === deletePriority) {
+                        queue.splice(i, 1);  // Remove the document from the queue
+                        deletedCount++;
+                    }
+                }
+
+                if (deletedCount > 0) {
+                    document.getElementById('deletedDocument').textContent = `Deleted ${deletedCount} Document(s): ${deleteDocName} (Priority: ${deletePriority})`;
+                    document.getElementById('feedbackMessage').textContent = '';  // Clear feedback message
+                } else {
+                    document.getElementById('deletedDocument').textContent = '';
+                    document.getElementById('feedbackMessage').textContent = 'No matching documents found for deletion.';
+                }
+                updateQueueDisplay();
+                // Clear input fields
+                document.getElementById('deleteDocName').value = '';
+                document.getElementById('deletePriority').value = '';
+            } else {
+                document.getElementById('feedbackMessage').textContent = 'Please enter a valid document name and priority.';
+            }
+            isProcessing = false;
+        }
+
+        // Function to change the priority of a document with visualization
+        async function changePriority() {
+            if (isProcessing) return;
+            isProcessing = true;
+
+            console.log('Change Priority function called');
+
+            const changeDocName = document.getElementById('changeDocName').value.trim();
+            const newPriorityInput = document.getElementById('changePriority').value.trim();
+            const newPriority = parseInt(newPriorityInput, 10);
+            
+            if (changeDocName && !isNaN(newPriority)) {
+                let found = false;
+                for (let i = 0; i < queue.length; i++) {
+                    const doc = queue[i];
+
+                    // Highlight the document being checked
+                    highlightDocument(i);
+                    await sleep(500);  // Wait for 500ms to simulate the checking process
+
+                    if (doc.name === changeDocName) {
+                        doc.priority = newPriority;
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (found) {
+                    // Re-sort queue by new priority
+                    queue.sort((a, b) => a.priority - b.priority);
+                    updateQueueDisplay();
+                    document.getElementById('feedbackMessage').textContent = '';  // Clear feedback message
+                    // Clear input fields
+                    document.getElementById('changeDocName').value = '';
+                    document.getElementById('changePriority').value = '';
+                } else {
+                    document.getElementById('feedbackMessage').textContent = 'Document not found in the queue.';
+                }
+            } else {
+                document.getElementById('feedbackMessage').textContent = 'Please enter a valid document name and new priority.';
+            }
+            isProcessing = false;
+        }
+
+        // Function to search for a document with visualization
+        async function searchDocument() {
+            if (isProcessing) return;
+            isProcessing = true;
+
+            console.log('Search function called');
+
+            const searchDocName = document.getElementById('searchDocName').value.trim();
+            const resultElement = document.getElementById('searchResult');
+            let found = false;
+
+            for (let i = 0; i < queue.length; i++) {
+                const doc = queue[i];
+
+                // Highlight the document being checked
+                highlightDocument(i);
+                await sleep(500);  // Wait for 500ms to simulate the checking process
+
+                if (doc.name === searchDocName) {
+                    resultElement.innerHTML = `<p>Document: ${doc.name}</p><p>Priority: ${doc.priority}</p>`;
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                resultElement.innerHTML = 'Document not found.';
+            }
+            isProcessing = false;
+        }
+
+        // Helper function to highlight the document being checked
+        function highlightDocument(index) {
+            const queueContainer = document.getElementById('queue');
+            const docElements = queueContainer.getElementsByClassName('document');
+            Array.from(docElements).forEach((el, i) => {
+                if (i === index) {
+                    el.classList.add('highlighted');
+                } else {
+                    el.classList.remove('highlighted');
+                }
+            });
+        }
+
+        // Helper function to pause execution for a given time (in ms)
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // Function to update the visual representation of the queue
+        function updateQueueDisplay() {
+            console.log('Update Queue Display function called');
+
+            const queueContainer = document.getElementById('queue');
+            queueContainer.innerHTML = '';  // Clear the current display
+
+            queue.forEach(doc => {
+                const docElement = document.createElement('div');
+                docElement.className = 'document';
+                docElement.innerHTML = `<p>${doc.name}</p><p>Priority: ${doc.priority}</p>`;
+                queueContainer.appendChild(docElement);
+            });
+        }
+    </script>
+</body>
+</html>
